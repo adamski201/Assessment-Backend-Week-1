@@ -5,8 +5,6 @@ from datetime import datetime
 
 import pytest
 
-from app import app_history
-
 
 class TestBetween:
     """Tests for the between route"""
