@@ -23,7 +23,7 @@ jobs:
       # Install required packages
       - name: Install packages
         run: |
-          pip3 install -r ./dats_api/requirements.txt
+          pip3 install -r ./days_api/requirements.txt
           pip3 install pytest pylint
       # Run pytest
       - name: Run tests
