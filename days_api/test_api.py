@@ -5,6 +5,8 @@ from datetime import datetime
 
 import pytest
 
+from app import app_history
+
 
 class TestBetween:
     """Tests for the between route"""
@@ -16,42 +18,40 @@ class TestBetween:
 
         assert result.status_code == 405
 
-    @pytest.mark.parametrize("data", ({},
-                                      {"first": 1},
-                                      {"second": 2},
-                                      {"first": 1, "econd": 2},
-                                      {"A": 1, "B": 2}))
+    @pytest.mark.parametrize(
+        "data",
+        ({}, {"first": 1}, {"second": 2}, {"first": 1, "econd": 2}, {"A": 1, "B": 2}),
+    )
     def test_requires_data(self, data, test_app):
         """Checks that the route rejects missing data."""
 
         result = test_app.post("/between", json=data)
 
         assert result.status_code == 400
-        assert result.json == {
-            "error": "Missing required data."
-        }
+        assert result.json == {"error": "Missing required data."}
 
-    @pytest.mark.parametrize("data", ({"first": 1, "last": 2},
-                                      {"first": 33.0, "last": True},
-                                      {"first": "red", "last": "blue"},
-                                      {"first": "23/1/1999", "last": "1999/2/16"}))
+    @pytest.mark.parametrize(
+        "data",
+        (
+            {"first": 1, "last": 2},
+            {"first": 33.0, "last": True},
+            {"first": "red", "last": "blue"},
+            {"first": "23/1/1999", "last": "1999/2/16"},
+        ),
+    )
     def test_requires_valid_data(self, data, test_app):
         """Checks that the route rejects invalid data."""
 
         result = test_app.post("/between", json=data)
 
         assert result.status_code == 400
-        assert result.json == {
-            "error": "Unable to convert value to datetime."
-        }
+        assert result.json == {"error": "Unable to convert value to datetime."}
 
     @patch("app.add_to_history")
     def test_calls_add_to_history(self, fake_add, test_app):
         """Checks that the route calls the add_to_history function."""
 
-        test_app.post("/between", json={
-            "first": "12.1.2000", "last": "14.1.2000"
-        })
+        test_app.post("/between", json={"first": "12.1.2000", "last": "14.1.2000"})
 
         assert fake_add.called
         assert fake_add.call_count == 1
@@ -60,9 +60,7 @@ class TestBetween:
     def test_calls_convert(self, fake_convert, test_app):
         """Checks that the route calls the conversion function."""
 
-        test_app.post("/between", json={
-            "first": "12.1.2000", "last": "14.1.2000"
-        })
+        test_app.post("/between", json={"first": "12.1.2000", "last": "14.1.2000"})
 
         assert fake_convert.called
         assert fake_convert.call_count == 2
@@ -71,38 +69,31 @@ class TestBetween:
     def test_calls_between(self, fake_between, test_app):
         """Checks that the route calls the get_days_between function."""
 
-        test_app.post("/between", json={
-            "first": "12.1.2000", "last": "14.1.2000"
-        })
+        test_app.post("/between", json={"first": "12.1.2000", "last": "14.1.2000"})
 
         assert fake_between.called
         assert fake_between.call_count == 1
 
-    @pytest.mark.parametrize("data, out", (({"first": "12.1.2000", "last": "14.1.2000"}, 2),
-                                           ({"first": "1.1.2000",
-                                            "last": "1.2.2000"}, 31),
-                                           ({"first": "12.2.2001",
-                                            "last": "12.2.2002"}, 365),
-                                           ({"first": "1.2.2000",
-                                            "last": "31.1.2000"}, -1),
-                                           ({"first": "1.1.2000",
-                                            "last": "1.1.2000"}, 0),
-                                           ({"first": "28.2.2000",
-                                            "last": "1.3.2000"}, 2),
-                                           ({"first": "1.1.2000",
-                                            "last": "7.1.2000"}, 6),
-                                           ({"first": "12.1.2002",
-                                            "last": "14.1.2001"}, -363),
-                                           ))
+    @pytest.mark.parametrize(
+        "data, out",
+        (
+            ({"first": "12.1.2000", "last": "14.1.2000"}, 2),
+            ({"first": "1.1.2000", "last": "1.2.2000"}, 31),
+            ({"first": "12.2.2001", "last": "12.2.2002"}, 365),
+            ({"first": "1.2.2000", "last": "31.1.2000"}, -1),
+            ({"first": "1.1.2000", "last": "1.1.2000"}, 0),
+            ({"first": "28.2.2000", "last": "1.3.2000"}, 2),
+            ({"first": "1.1.2000", "last": "7.1.2000"}, 6),
+            ({"first": "12.1.2002", "last": "14.1.2001"}, -363),
+        ),
+    )
     def test_returns_correct_value(self, data, out, test_app):
         """Checks that the route returns accurate responses."""
 
         result = test_app.post("/between", json=data)
 
         assert result.status_code == 200
-        assert result.json == {
-            "days": out
-        }
+        assert result.json == {"days": out}
 
 
 class TestWeekday:
@@ -119,9 +110,7 @@ class TestWeekday:
     def test_calls_convert(self, fake_convert, test_app):
         """Checks that the route calls the conversion function."""
 
-        test_app.post("/weekday", json={
-            "date": "12.1.2000"
-        })
+        test_app.post("/weekday", json={"date": "12.1.2000"})
 
         assert fake_convert.called
         assert fake_convert.call_count == 1
@@ -130,68 +119,65 @@ class TestWeekday:
     def test_calls_day_of_week(self, fake_get_day, test_app):
         """Checks that the route calls the get_day_of_week_on function."""
 
-        test_app.post("/weekday", json={
-            "date": "12.1.2000"
-        })
+        test_app.post("/weekday", json={"date": "12.1.2000"})
 
         assert fake_get_day.called
         assert fake_get_day.call_count == 1
 
-    @pytest.mark.parametrize("data", ({},
-                                      {"first": 1},
-                                      {"dat": 2},
-                                      {"Date": 3},
-                                      {"dates": 4}))
+    @pytest.mark.parametrize(
+        "data", ({}, {"first": 1}, {"dat": 2}, {"Date": 3}, {"dates": 4})
+    )
     def test_requires_data(self, data, test_app):
         """Checks that the route rejects missing data."""
 
         result = test_app.post("/weekday", json=data)
 
         assert result.status_code == 400
-        assert result.json == {
-            "error": "Missing required data."
-        }
+        assert result.json == {"error": "Missing required data."}
 
-    @pytest.mark.parametrize("data", ({"date": 1},
-                                      {"date": "1880.12.01"},
-                                      {"date": "red"},
-                                      {"date": "24.5.19"},
-                                      {"date": "24/5/1999"}))
+    @pytest.mark.parametrize(
+        "data",
+        (
+            {"date": 1},
+            {"date": "1880.12.01"},
+            {"date": "red"},
+            {"date": "24.5.19"},
+            {"date": "24/5/1999"},
+        ),
+    )
     def test_requires_valid_data(self, data, test_app):
         """Checks that the route rejects invalid data."""
 
         result = test_app.post("/weekday", json=data)
 
         assert result.status_code == 400
-        assert result.json == {
-            "error": "Unable to convert value to datetime."
-        }
+        assert result.json == {"error": "Unable to convert value to datetime."}
 
-    @pytest.mark.parametrize("data, out", (({"date": "09.10.2023"}, "Monday"),
-                                           ({"date": "10.10.2023"}, "Tuesday"),
-                                           ({"date": "11.10.2023"}, "Wednesday"),
-                                           ({"date": "12.10.2023"}, "Thursday"),
-                                           ({"date": "13.10.2023"}, "Friday"),
-                                           ({"date": "14.10.2023"}, "Saturday"),
-                                           ({"date": "15.10.2023"}, "Sunday")
-                                           ))
+    @pytest.mark.parametrize(
+        "data, out",
+        (
+            ({"date": "09.10.2023"}, "Monday"),
+            ({"date": "10.10.2023"}, "Tuesday"),
+            ({"date": "11.10.2023"}, "Wednesday"),
+            ({"date": "12.10.2023"}, "Thursday"),
+            ({"date": "13.10.2023"}, "Friday"),
+            ({"date": "14.10.2023"}, "Saturday"),
+            ({"date": "15.10.2023"}, "Sunday"),
+        ),
+    )
     def test_returns_correct_value(self, data, out, test_app):
         """Checks that the route returns accurate responses."""
 
         result = test_app.post("/weekday", json=data)
 
         assert result.status_code == 200
-        assert result.json == {
-            "weekday": out
-        }
+        assert result.json == {"weekday": out}
 
     @patch("app.add_to_history")
     def test_calls_add_to_history(self, fake_add, test_app):
         """Checks that the route calls the add_to_history function."""
 
-        test_app.post("/between", json={
-            "first": "12.1.2000", "last": "14.1.2000"
-        })
+        test_app.post("/between", json={"first": "12.1.2000", "last": "14.1.2000"})
 
         assert fake_add.called
         assert fake_add.call_count == 1
@@ -207,20 +193,14 @@ class TestHistory:
 
         assert result.status_code == 405
 
-    @pytest.mark.parametrize("n", (("red"),
-                                   (13.5),
-                                   (0),
-                                   (24),
-                                   (-8)))
+    @pytest.mark.parametrize("n", (("red"), (13.5), (0), (24), (-8)))
     def test_rejects_invalid_parameter(self, n, test_app):
         """Checks that invalid number parameters are rejected."""
 
         result = test_app.get(f"/history?number={n}")
 
         assert result.status_code == 400
-        assert result.json == {
-            "error": "Number must be an integer between 1 and 20."
-        }
+        assert result.json == {"error": "Number must be an integer between 1 and 20."}
 
     @pytest.mark.parametrize("n", (1, 2, 3, 4, 10))
     def test_returns_correct_number_of_records(self, n, test_app):
@@ -259,9 +239,7 @@ class TestHistory:
 
         # Check that clearing happened without error
         assert result.status_code == 200
-        assert result.json == {
-            "status": "History cleared"
-        }
+        assert result.json == {"status": "History cleared"}
 
     def test_restarts_history_after_delete(self, test_app):
         """Checks that history is reset after a DELETE request."""
@@ -280,9 +258,11 @@ class TestHistory:
         assert result.status_code == 200
         assert len(data) == 1
         assert data == [
-            {"at": datetime.now().strftime("%d/%m/%Y %H:%M"),
-             "method": "GET",
-             "route": "history"}
+            {
+                "at": datetime.now().strftime("%d/%m/%Y %H:%M"),
+                "method": "GET",
+                "route": "history",
+            }
         ]
 
     def test_history_returns_in_reverse_order(self, test_app):
@@ -325,9 +305,7 @@ class TestHistory:
     def test_calls_add_to_history(self, fake_add, test_app):
         """Checks that the route calls the add_to_history function."""
 
-        test_app.post("/between", json={
-            "first": "12.1.2000", "last": "14.1.2000"
-        })
+        test_app.post("/between", json={"first": "12.1.2000", "last": "14.1.2000"})
 
         assert fake_add.called
         assert fake_add.call_count == 1
