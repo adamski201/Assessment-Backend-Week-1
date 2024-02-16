@@ -1,0 +1,14 @@
+============================= test session starts ==============================
+platform linux -- Python 3.11.8, pytest-8.0.0, pluggy-1.4.0
+rootdir: /home/runner/work/Assessment-Backend-Week-1/Assessment-Backend-Week-1
+collected 85 items
+
+days_api/test_api.py ................................................... [ 60%]
+.........                                                                [ 70%]
+days_api/test_date_functions.py .........................                [100%]
+
+============================== 85 passed in 0.22s ==============================
+
+--------------------------------------------------------------------
+Your code has been rated at 10.00/10 (previous run: 10.00/10, +0.00)
+
